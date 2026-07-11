@@ -1,5 +1,5 @@
 const { Router } = require('express');
-const { createProxyMiddleware } = require('http-proxy-middleware');
+const { createProxyMiddleware, fixRequestBody } = require('http-proxy-middleware');
 
 const router = Router();
 
@@ -16,6 +16,7 @@ router.use(
           proxyReq.setHeader('X-User-Id', req.user.googleId);
           proxyReq.setHeader('X-User-Email', req.user.email);
         }
+        fixRequestBody(proxyReq, req);
       },
       error: (_err, _req, res) => {
         if (res.writeHead) {
@@ -40,6 +41,7 @@ router.use(
           proxyReq.setHeader('X-User-Id', req.user.googleId);
           proxyReq.setHeader('X-User-Email', req.user.email);
         }
+        fixRequestBody(proxyReq, req);
       },
       error: (_err, _req, res) => {
         if (res.writeHead) {
