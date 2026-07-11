@@ -4,6 +4,7 @@ const cors = require('cors');
 
 const authRoutes = require('./routes/auth');
 const tripRoutes = require('./routes/trips');
+const proxyRoutes = require('./routes/proxy');
 const authenticate = require('./middleware/auth');
 const errorHandler = require('./middleware/errorHandler');
 
@@ -19,6 +20,9 @@ app.use('/auth', authRoutes);
 
 // Protected routes — valid JWT required
 app.use('/api/trips', authenticate, tripRoutes);
+
+// Internal proxy — forwards to microservices (authenticated)
+app.use('/api/proxy', authenticate, proxyRoutes);
 
 // Health check (public)
 app.get('/', (req, res) => {
