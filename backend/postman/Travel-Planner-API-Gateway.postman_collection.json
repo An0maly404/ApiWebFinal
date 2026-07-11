@@ -1,0 +1,160 @@
+{
+  "info": {
+    "name": "Travel Planner API Gateway",
+    "description": "Collaborative Travel Planner — API Gateway collection demonstrating authenticated and unauthenticated calls for the live project demo.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{jwt_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "gateway_url",
+      "value": "http://localhost:3000"
+    },
+    {
+      "key": "jwt_token",
+      "value": ""
+    },
+    {
+      "key": "google_credential",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Authenticate — Get JWT",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "if (pm.response.code === 200) {",
+              "    var json = pm.response.json();",
+              "    pm.collectionVariables.set('jwt_token', json.token);",
+              "    console.log('JWT stored in collection variable');",
+              "} else {",
+              "    console.log('Auth failed — did you provide a valid Google credential?');",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"credential\": \"{{google_credential}}\"\n}"
+        },
+        "url": {
+          "raw": "{{gateway_url}}/auth/google",
+          "host": ["{{gateway_url}}"],
+          "path": ["auth", "google"]
+        },
+        "description": "Step 1: Send a Google ID token to obtain an internal JWT.\n\nCopy a real Google credential from the browser DevTools console after signing in, then paste it into the `google_credential` collection variable."
+      }
+    },
+    {
+      "name": "2. GET Trips — Authenticated ✅",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+        ],
+        "url": {
+          "raw": "{{gateway_url}}/api/trips",
+          "host": ["{{gateway_url}}"],
+          "path": ["api", "trips"]
+        },
+        "description": "✅ Authenticated request — fetches all trips using a valid JWT stored from Step 1."
+      }
+    },
+    {
+      "name": "3. GET Trips — Unauthenticated ❌",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{gateway_url}}/api/trips",
+          "host": ["{{gateway_url}}"],
+          "path": ["api", "trips"]
+        },
+        "description": "❌ Token-less request — intentionally omits the Authorization header. Expected response: 401 Unauthorized with a clean JSON error payload."
+      }
+    },
+    {
+      "name": "4. POST Trip — Authenticated ✅",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"destination\": \"Tokyo\",\n  \"startDate\": \"2026-10-01\",\n  \"endDate\": \"2026-10-07\",\n  \"activities\": [\n    { \"time\": \"10:00\", \"title\": \"Senso-ji Temple\", \"date\": \"2026-10-01\" }\n  ]\n}"
+        },
+        "url": {
+          "raw": "{{gateway_url}}/api/trips",
+          "host": ["{{gateway_url}}"],
+          "path": ["api", "trips"]
+        },
+        "description": "✅ Create a new trip with a valid JWT."
+      }
+    },
+    {
+      "name": "5. Proxy — Itinerary Service Health",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+        ],
+        "url": {
+          "raw": "{{gateway_url}}/api/proxy/itinerary/health",
+          "host": ["{{gateway_url}}"],
+          "path": ["api", "proxy", "itinerary", "health"]
+        },
+        "description": "Gateway proxies this request to the internal Itinerary Microservice (service-a :5001). The user's identity is forwarded via X-User-Id and X-User-Email headers."
+      }
+    },
+    {
+      "name": "6. Proxy — Weather Service Health",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+        ],
+        "url": {
+          "raw": "{{gateway_url}}/api/proxy/weather/health",
+          "host": ["{{gateway_url}}"],
+          "path": ["api", "proxy", "weather", "health"]
+        },
+        "description": "Gateway proxies this request to the internal Weather Microservice (service-b :5002). The user's identity is forwarded via X-User-Id and X-User-Email headers."
+      }
+    },
+    {
+      "name": "7. Health Check — Public",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{gateway_url}}/",
+          "host": ["{{gateway_url}}"],
+          "path": [""]
+        },
+        "description": "Public health check — no authentication required."
+      }
+    }
+  ]
+}
