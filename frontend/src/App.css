@@ -63,3 +63,9 @@
 .error {
   color: #e5484d;
 }
+
+.weather {
+  color: var(--accent);
+  font-weight: 600;
+  margin: 0 0 1rem;
+}

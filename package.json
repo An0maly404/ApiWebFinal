@@ -1,0 +1,10 @@
+{
+  "name": "collaborative-travel-planner",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently -n service-a,service-b,backend,frontend -c blue,green,yellow,magenta \"npm run start --prefix service-a\" \"npm run start --prefix service-b\" \"npm run dev --prefix backend\" \"npm run dev --prefix frontend\""
+  },
+  "devDependencies": {
+    "concurrently": "^9.0.1"
+  }
+}

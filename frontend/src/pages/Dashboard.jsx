@@ -2,11 +2,22 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { API_BASE_URL, getToken } from '../lib/auth'
 
+const WEATHER_QUERY = `
+  query($city: String!) {
+    weather(city: $city) {
+      city
+      temperature
+      description
+    }
+  }
+`
+
 function Dashboard() {
   const navigate = useNavigate()
   const [trips, setTrips] = useState([])
   const [selectedTripId, setSelectedTripId] = useState(null)
   const [error, setError] = useState(null)
+  const [weather, setWeather] = useState(null)
 
   useEffect(() => {
     fetch(`${API_BASE_URL}/api/trips`, {
@@ -32,6 +43,28 @@ function Dashboard() {
 
   const selectedTrip = trips.find((trip) => trip._id === selectedTripId)
 
+  useEffect(() => {
+    if (!selectedTrip) {
+      setWeather(null)
+      return
+    }
+
+    fetch(`${API_BASE_URL}/api/proxy/weather/graphql`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${getToken()}`,
+      },
+      body: JSON.stringify({
+        query: WEATHER_QUERY,
+        variables: { city: selectedTrip.destination },
+      }),
+    })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((result) => setWeather(result?.data?.weather ?? null))
+      .catch(() => setWeather(null))
+  }, [selectedTrip])
+
   return (
     <div className="dashboard">
       <aside className="sidebar">
@@ -56,6 +89,11 @@ function Dashboard() {
         {selectedTrip ? (
           <>
             <h2>{selectedTrip.destination}</h2>
+            {weather && (
+              <p className="weather">
+                {Math.round(weather.temperature)}°C — {weather.description}
+              </p>
+            )}
             <ul>
               {selectedTrip.activities.map((activity, index) => (
                 <li key={`${activity.time}-${index}`}>
