@@ -1,8 +1,8 @@
 import { Navigate } from 'react-router-dom'
-import session from '../mocks/session.json'
+import { getToken } from '../lib/auth'
 
 function RequireAuth({ children }) {
-  if (!session.isAuthenticated) {
+  if (!getToken()) {
     return <Navigate to="/login" replace />
   }
 

@@ -1,18 +1,38 @@
-import { useState } from 'react'
-import session from '../mocks/session.json'
-import trips from '../mocks/trips.json'
+import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { API_BASE_URL, getToken } from '../lib/auth'
 
 function Dashboard() {
-  const userTrips = trips.filter((trip) => trip.userId === session.userId)
-  const [selectedTripId, setSelectedTripId] = useState(userTrips[0]?.id)
-  const selectedTrip = userTrips.find((trip) => trip.id === selectedTripId)
+  const navigate = useNavigate()
+  const [trips, setTrips] = useState([])
+  const [selectedTripId, setSelectedTripId] = useState(null)
+
+  useEffect(() => {
+    fetch(`${API_BASE_URL}/api/trips`, {
+      headers: { Authorization: `Bearer ${getToken()}` },
+    })
+      .then((res) => {
+        if (!res.ok) {
+          navigate('/login')
+          return null
+        }
+        return res.json()
+      })
+      .then((data) => {
+        if (!data) return
+        setTrips(data)
+        setSelectedTripId(data[0]?.id)
+      })
+  }, [navigate])
+
+  const selectedTrip = trips.find((trip) => trip.id === selectedTripId)
 
   return (
     <div className="dashboard">
       <aside className="sidebar">
         <h2>Upcoming Trips</h2>
         <ul>
-          {userTrips.map((trip) => (
+          {trips.map((trip) => (
             <li key={trip.id}>
               <button
                 type="button"

@@ -59,3 +59,7 @@
   min-height: 100vh;
   gap: 0.5rem;
 }
+
+.error {
+  color: #e5484d;
+}
