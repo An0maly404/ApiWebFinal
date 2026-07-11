@@ -1,0 +1,10 @@
+{
+  "London": [
+    { "date": "2026-08-01", "condition": "Cloudy", "tempHighC": 21, "tempLowC": 14 },
+    { "date": "2026-08-02", "condition": "Sunny", "tempHighC": 23, "tempLowC": 15 }
+  ],
+  "Paris": [
+    { "date": "2026-09-10", "condition": "Rain", "tempHighC": 18, "tempLowC": 12 },
+    { "date": "2026-09-11", "condition": "Partly Cloudy", "tempHighC": 19, "tempLowC": 13 }
+  ]
+}
