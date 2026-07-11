@@ -1,28 +1,32 @@
-# ApiWebFinal
+# Collaborative Travel Planner
 
 By Noah Hemon, Antoine Iglesias-Tallon, Nassim Ainine
 
-# Service A — Itinerary Service
+## Setup
 
-Port: 5001
+Each service needs its own `.env` file (never committed):
 
-## Endpoints
-- GET /health
-- POST /trips — body: { userId, destination, startDate, activities: [{ time, title }] }
-- GET /trips/:userId — returns array of trips for that user
+| Service | Example file | Required variables |
+|---|---|---|
+| `frontend/` | `.env.example` | `VITE_GOOGLE_CLIENT_ID`, `VITE_API_BASE_URL` |
+| `backend/` | `.env.example` | `GOOGLE_CLIENT_ID`, `JWT_SECRET`, `PORT`, `FRONTEND_URL` |
+| `service-a/` | `.env.exemple` | `MONGO_URI` |
+| `service-b/` | `.env.exemple` | `WEATHER_API_KEY`, `DATABASE_URL` |
 
-# Service B — Weather Service
+`GOOGLE_CLIENT_ID` (backend) and `VITE_GOOGLE_CLIENT_ID` (frontend) must be the same value.
 
-Port: 5002
+Install dependencies:
+```
+cd frontend && npm install && cd ..
+cd backend && npm install && cd ..
+cd service-a && npm install && cd ..
+cd service-b && npm install && cd ..
+npm install
+```
 
-## GraphQL endpoint
-POST /graphql
+## Run
 
-## Example query
-query {
-  weather(city: "London") {
-    city
-    temperature
-    description
-  }
-}
+```
+npm run dev
+```
+Starts `service-a`, `service-b`, the backend gateway, and the frontend together in one terminal.
