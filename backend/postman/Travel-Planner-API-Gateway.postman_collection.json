@@ -26,6 +26,14 @@
     {
       "key": "google_credential",
       "value": ""
+    },
+    {
+      "key": "created_trip_id",
+      "value": ""
+    },
+    {
+      "key": "other_trip_id",
+      "value": ""
     }
   ],
   "item": [
@@ -95,6 +103,21 @@
     },
     {
       "name": "4. POST Trip — Authenticated ✅",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "if (pm.response.code === 200 || pm.response.code === 201) {",
+              "    var json = pm.response.json();",
+              "    pm.collectionVariables.set('created_trip_id', json._id);",
+              "    console.log('Created trip id stored in collection variable');",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
       "request": {
         "method": "POST",
         "header": [
@@ -110,11 +133,41 @@
           "host": ["{{gateway_url}}"],
           "path": ["api", "trips"]
         },
-        "description": "✅ Create a new trip with a valid JWT."
+        "description": "✅ Create a new trip with a valid JWT. The test script automatically stores the new trip's id in `created_trip_id`, used by request 6 below."
       }
     },
     {
-      "name": "5. Proxy — Itinerary Service Health",
+      "name": "5. DELETE Trip — Wrong Owner ❌",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+        ],
+        "url": {
+          "raw": "{{gateway_url}}/api/trips/{{other_trip_id}}",
+          "host": ["{{gateway_url}}"],
+          "path": ["api", "trips", "{{other_trip_id}}"]
+        },
+        "description": "❌ Attempts to delete a trip that belongs to a different user. Set the `other_trip_id` collection variable to the `_id` of any trip NOT owned by the currently authenticated user (e.g. one belonging to a teammate's account). Expected response: 403 Forbidden — \"Not your trip\"."
+      }
+    },
+    {
+      "name": "6. DELETE Trip — Authenticated ✅",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+        ],
+        "url": {
+          "raw": "{{gateway_url}}/api/trips/{{created_trip_id}}",
+          "host": ["{{gateway_url}}"],
+          "path": ["api", "trips", "{{created_trip_id}}"]
+        },
+        "description": "✅ Deletes the trip created in request 4, using the id auto-saved into `created_trip_id`. Expected response: 204 No Content. Re-run request 2 afterward to confirm it's gone."
+      }
+    },
+    {
+      "name": "7. Proxy — Itinerary Service Health",
       "request": {
         "method": "GET",
         "header": [
@@ -129,7 +182,7 @@
       }
     },
     {
-      "name": "6. Proxy — Weather Service Health",
+      "name": "8. Proxy — Weather Service Health",
       "request": {
         "method": "GET",
         "header": [
@@ -144,7 +197,7 @@
       }
     },
     {
-      "name": "7. Health Check — Public",
+      "name": "9. Health Check — Public",
       "request": {
         "method": "GET",
         "header": [],
