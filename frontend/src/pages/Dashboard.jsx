@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { googleLogout } from '@react-oauth/google'
 import { API_BASE_URL, getToken, clearSession } from '../lib/auth'
 
 const WEATHER_QUERY = `
@@ -208,6 +209,19 @@ function Dashboard() {
             + Add Trip
           </button>
         )}
+
+        <button
+          type="button"
+          className="logout-btn"
+          onClick={() => {
+            googleLogout()
+            clearSession()
+            navigate('/login')
+          }}
+          title="Sign out"
+        >
+          🚪 Sign out
+        </button>
       </aside>
 
       <main className="timeline">
@@ -232,18 +246,6 @@ function Dashboard() {
           !error && <p>No trips yet.</p>
         )}
       </main>
-
-      <button
-        type="button"
-        className="logout-btn"
-        onClick={() => {
-          clearSession()
-          navigate('/login')
-        }}
-        title="Sign out"
-      >
-        🚪 Sign out
-      </button>
     </div>
   )
 }
