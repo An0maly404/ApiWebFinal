@@ -35,4 +35,23 @@ router.post('/', async (req, res) => {
   }
 });
 
+// DELETE /api/trips/:id - Delete a trip via the itinerary service
+router.delete('/:id', async (req, res) => {
+  try {
+    const response = await fetch(`${ITINERARY_SERVICE_URL}/trips/${req.params.id}`, {
+      method: 'DELETE',
+      headers: { 'X-User-Id': req.user.googleId },
+    });
+
+    if (response.status === 204) {
+      return res.status(204).send();
+    }
+
+    const data = await response.json();
+    res.status(response.status).json(data);
+  } catch (err) {
+    res.status(502).json({ error: 'Bad Gateway', message: 'Itinerary service is unreachable' });
+  }
+});
+
 module.exports = router;

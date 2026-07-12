@@ -61,6 +61,28 @@
   color: var(--text);
 }
 
+.timeline-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.delete-trip {
+  flex: 0 0 auto;
+  padding: 0.4rem 0.8rem;
+  border: 1px solid #fca5a5;
+  border-radius: 4px;
+  background: none;
+  color: #e5484d;
+  font: inherit;
+  cursor: pointer;
+}
+
+.delete-trip:hover {
+  background: #fee2e2;
+}
+
 .timeline ul {
   list-style: none;
   padding: 0;

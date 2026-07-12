@@ -39,6 +39,22 @@ app.get("/trips/:userId", async (req, res) => {
     }
 });
 
+app.delete("/trips/:id", async (req, res) => {
+    try {
+        const trip = await Trip.findById(req.params.id);
+        if (!trip) {
+            return res.status(404).json({ error: "Trip not found" });
+        }
+        if (trip.userId !== req.headers["x-user-id"]) {
+            return res.status(403).json({ error: "Not your trip" });
+        }
+        await trip.deleteOne();
+        res.status(204).send();
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+});
+
 connectDB().then(() => {
     app.listen(PORT, () => {
         console.log(`Service A running on port ${PORT}`);

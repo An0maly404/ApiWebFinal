@@ -128,6 +128,19 @@ function Dashboard() {
       .finally(() => setSubmitting(false))
   }
 
+  const handleDeleteTrip = (tripId) => {
+    fetch(`${API_BASE_URL}/api/trips/${tripId}`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${getToken()}` },
+    })
+      .then(() => fetchTrips())
+      .then((data) => {
+        if (data) {
+          setSelectedTripId(data[0]?._id ?? null)
+        }
+      })
+  }
+
   return (
     <div className="dashboard">
       <aside className="sidebar">
@@ -228,7 +241,16 @@ function Dashboard() {
         {error && <p className="error">{error}</p>}
         {selectedTrip ? (
           <>
-            <h2>{selectedTrip.destination}</h2>
+            <div className="timeline-header">
+              <h2>{selectedTrip.destination}</h2>
+              <button
+                type="button"
+                className="delete-trip"
+                onClick={() => handleDeleteTrip(selectedTrip._id)}
+              >
+                Delete trip
+              </button>
+            </div>
             {weather && (
               <p className="weather">
                 {Math.round(weather.temperature)}°C — {weather.description}
