@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { API_BASE_URL, getToken } from '../lib/auth'
+import { API_BASE_URL, getToken, clearSession } from '../lib/auth'
 
 const WEATHER_QUERY = `
   query($city: String!) {
@@ -232,6 +232,18 @@ function Dashboard() {
           !error && <p>No trips yet.</p>
         )}
       </main>
+
+      <button
+        type="button"
+        className="logout-btn"
+        onClick={() => {
+          clearSession()
+          navigate('/login')
+        }}
+        title="Sign out"
+      >
+        🚪 Sign out
+      </button>
     </div>
   )
 }
